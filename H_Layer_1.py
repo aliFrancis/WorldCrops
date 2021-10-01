@@ -11,7 +11,6 @@ gpu_id = 0
 bavaria = pd.read_excel("Training_bavaria.xlsx")
 
 #%%
-# bavaria_test.drop(['Unnamed: 0'], axis=1, inplace=True)
 bavaria.drop(['Unnamed: 0'], axis=1, inplace=True)
 
 #%%
@@ -169,13 +168,6 @@ model.cuda(gpu_id)
 criterion = nn.BCELoss()
 optimizer = torch.optim.AdamW(params=model.parameters(), lr=1e-6) #, weight_decay=4e-5)
 
-
-# sample = next(iter(loader))[0]
-# target = next(iter(loader))[1]
-# out = model(sample)
-# print(out.shape)
-# print(model(sample).shape)
-# print(target.shape)
 #%%
 epochs = 500
 for ep in range(epochs):
