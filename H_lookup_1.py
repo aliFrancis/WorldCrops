@@ -4,15 +4,6 @@ import numpy as np
 from modules import Hopfield, HopfieldPooling, HopfieldLayer
 from torch.nn.functional import mse_loss
 
-model = HopfieldLayer(
-    input_size=1,                           # R
-    hidden_size=2,                          # W_K
-    pattern_size=3,                         # W_V
-    quantity=4,                             # W_K
-    scaling=1.0,
-    stored_pattern_as_static=True,
-    state_pattern_as_static=True)
-
 
 #%% DATA 1 (WORKING!)
 tot = 7
@@ -25,7 +16,7 @@ data = torch.zeros((tot,40)) + 0
 for n in range(tot):
     # rd = int(torch.rand(1) * 3)
     originals[n] = originals[n] #/torch.sum(originals[n])
-    data[n,0:40] = originals[n,0:40] + torch.rand(40)/2
+    data[n,0:40] = originals[n,0:40] + torch.rand(40)/10
 
 print(data[None,None,0].shape)
 print(originals[None].shape)
@@ -138,7 +129,7 @@ originals = torch.zeros((unique,tot,40))
 prototype = torch.zeros((unique,40))
 for i in range(unique):
     for n in range(tot):
-        originals[i,n] = torch.sin(i*torch.linspace(0,2*np.pi,40)) + torch.rand(40)/2
+        originals[i,n] = torch.sin(i*torch.linspace(0,2*np.pi,40)) + (torch.rand(40)-0.5)*2
     prototype[i,:] = torch.sum(originals[i], 0)/tot
 
 print(originals[0,0,None,None].shape)
@@ -174,8 +165,8 @@ hopfield = Hopfield(
     disable_out_projection=True)
 
 #%%
-pattern = 3
-sample = 10
+pattern = 9
+sample = 11
 out = hopfield((prototype[None], originals[pattern,sample,None,None], prototype[None]))
 
 _, ax = plt.subplots(nrows=1, ncols=1, figsize=(8, 5))
@@ -183,3 +174,5 @@ ax.plot(torch.linspace(0,2*np.pi,40), originals[pattern,sample,:], label=f'Input
 ax.plot(torch.linspace(0,2*np.pi,40), prototype[pattern,:], label=f'Prototype {pattern}')
 ax.plot(torch.linspace(0,2*np.pi,40), out[0,0,:].detach(), linestyle='dotted', label='Output')
 ax.legend()
+
+# %%
