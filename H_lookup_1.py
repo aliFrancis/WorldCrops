@@ -165,8 +165,8 @@ hopfield = Hopfield(
     disable_out_projection=True)
 
 #%%
-pattern = 9
-sample = 11
+pattern = 9     # 0-9
+sample = 11     # 0-99
 out = hopfield((prototype[None], originals[pattern,sample,None,None], prototype[None]))
 
 _, ax = plt.subplots(nrows=1, ncols=1, figsize=(8, 5))
