@@ -22,23 +22,6 @@ bavaria.loc[(bavaria.NC == 311)|(bavaria.NC == 489), 'NC'] = 311  #Winterraps je
 #ZR = 603
 bavaria.loc[~((bavaria.NC == 600)|(bavaria.NC == 131)|(bavaria.NC == 400)|(bavaria.NC == 311)|(bavaria.NC == 115)|(bavaria.NC == 603)), 'NC'] = 1  
 
-# #assign codes to test area
-# bavaria_test.NC = bavaria_test.NC.astype(str).astype(int)
-# bavaria_test.loc[(bavaria_test.NC == 410), 'NC'] = 400  #Corn
-# bavaria_test.loc[~((bavaria_test.NC == 600)|(bavaria_test.NC == 131)|(bavaria_test.NC == 400)|(bavaria_test.NC == 311)|(bavaria_test.NC == 115)|(bavaria_test.NC == 603)), 'NC'] = 1  #rejection class other
-
-codex = np.unique(bavaria.NC.values).tolist()
-classes = [1,2,3,4,5,6,7]
-codex2class = dict(zip(codex,classes))
-
-class2codex = dict(zip(classes,classes))
-bavaria['NC'] = bavaria['NC'].map(codex2class)
-
-# codex = np.unique(bavaria_test.NC.values).tolist()
-# classes = [1,2,3,4,5,6,7]
-# codex2class = dict(zip(codex,classes))
-# class2codex = dict(zip(classes,classes))
-# bavaria_test['NC'] = bavaria_test['NC'].map(codex2class)
 
 #%%
 entries = bavaria.shape[0]
@@ -83,6 +66,11 @@ for n in range(7):
     target[n,:] = n
 inp = torch.einsum('abcd->acbd', inp)
 
+
+### TATSAECHLICHES DATENFORMAT 
+# input: 2100,bands,data_points
+# target: 2100,7
+
 inp_a = torch.zeros((2100,bands,data_points))
 target_a = torch.zeros((2100,7))
 k = 0
@@ -92,9 +80,11 @@ for n in range(7):
         target_a[k,n] = 1
         k += 1
 
+# Transponierte, weil...
 inp_a = torch.einsum('abc->acb',inp_a)
 
 #%%
+# Daten als Dataset fuer den Dataloader - ich hab das so gelernt/gelesen und daher ...
 from torch.utils.data import Dataset
 class data_set(Dataset):
 
@@ -111,7 +101,6 @@ class data_set(Dataset):
         return self.inp[idx], self.tar[idx]
 
 set = data_set(inp_a.cuda(gpu_id), target_a.cuda(gpu_id))
-# set = data_set(inp_a, target_a)
 loader = DataLoader(set, batch_size=batch_size, shuffle=True)
 
 #%%
@@ -123,28 +112,8 @@ class M1(torch.nn.Module):
         self.hopfield = Hopfield(
             scaling=1e0,
             input_bias=True,
-
             input_size=16,                           # R (dimension of input - not length of input)
-            # hidden_size=64,                          # W_K
-            # pattern_size=256,                        # W_V_1
-            # quantity=256,                            # W_K
             output_size=128,                           # W_V_2
-
-            # do not project layer input
-            # state_pattern_as_static=True,
-            # stored_pattern_as_static=True,
-            # pattern_projection_as_static=True,
-
-            # # do not pre-process layer input
-            # normalize_stored_pattern=False,
-            # normalize_stored_pattern_affine=False,
-            # normalize_state_pattern=False,
-            # normalize_state_pattern_affine=False,
-            # normalize_pattern_projection=False,
-            # normalize_pattern_projection_affine=False,
-
-            # # do not post-process layer output
-            # disable_out_projection=True
             )
         self.Linear_m = nn.Linear(in_features=14, out_features=1)
         self.Linear_b = nn.Linear(in_features=128, out_features=7)
@@ -152,39 +121,21 @@ class M1(torch.nn.Module):
     
     
     def forward(self, sample):
-        # print(sample.shape)
-        x = self.hopfield(sample)
-        # print(x.shape)
-        x = torch.einsum('abc->acb', x)
-        y = self.Linear_m(x)
-        # print(y.shape)
-        y = torch.einsum('abc->acb', y)
-        # # y = torch.einsum('abc->acb', x)
-        z = self.Linear_b(y)
-        # print(z.shape)
-        # exit()
-
-        # x = torch.einsum('abc->acb', x)
-        # return self.softmax(z)[:,:,0]
-        return self.softmax(z)
+        x = self.hopfield(sample)           # [128,14] neuer feature vector fuer die Zeitreihe
+        x = torch.einsum('abc->acb', x)     # Transponierte fuer den linear
+        y = self.Linear_m(x)                # [128,14] -> [128,1]
+        y = torch.einsum('abc->acb', y)     # Transponierte fuer den linear
+        z = self.Linear_b(y)                # [128,1] -> [7,1]
+        return self.softmax(z)              # Wahrscheinlichkeit fuer die 7 Typen
 
 model = M1()
 model.cuda(gpu_id)
-# criterion = nn.MSELoss()
-criterion = nn.BCELoss()
-# criterion = nn.BCEWithLogitsLoss()
+criterion = nn.BCELoss()    # gut fuer Wahrscheinlichkeiten
 optimizer = torch.optim.Adam(params=model.parameters(), lr=1e-6)#, weight_decay=1e-6)
 
 
-# sample = next(iter(loader))[0]
-# target = next(iter(loader))[1]
-# out = model(sample)
-# print(out.shape)
-# exit()
-# print(model(sample).shape)
-# print(target.shape)
 #%%
-epochs = 100
+epochs = 1
 for ep in range(epochs):
     print(ep)
     cor = 0
@@ -193,26 +144,22 @@ for ep in range(epochs):
         sample = data[0]
         target = data[1]
         out = model(sample)
-        # print(out.shape, target.shape)
-        # print(out[0,0])
-        # print(target[0])
-        # exit()
+        # Fuer das erste Element im Batch ... also eine echte accuracy ist das nicht
+        # ...ist eine Abschaetzung wie viele Samples waehrend des Trainings richtig sind
         if (torch.argmax(out[0]) == torch.argmax(target[0])):
             cor += 1
 
-        # loss = criterion(out[:,:,0], target)
+        # Update vom Netzwerk
         loss = criterion(out, target[:,None])
         loss.backward()
         optimizer.step()
-        # break
 
+    # Die Trainings accuracy ausgeben
+    # ... batch-size = 10 also gibts 210 batches und von jedem batch wird das erste Element
+    # ueberprueft ob es stimmt. N von 2100/10 richtig...
     if (ep%5==0):
         print('----', ep, '----')
-        # print('OUT:', out[0,:])
-        # print('TARGET:', target[0,:])
-        # print(torch.argmax(out[0]), torch.argmax(target[0]))
         print(cor, '/', 2100/batch_size)
-    # break
 
 
 
