@@ -99,12 +99,6 @@ dm_crops2 = AugmentationExperiments(data_dir = '../../data/cropdata/Bavaria/sent
 dm_crops3 = AugmentationExperiments(data_dir = '../../data/cropdata/Bavaria/sentinel-2/Training_bavaria.xlsx', batch_size = batch_size_sim, num_workers = num_workers, experiment='Experiment10')
 dm_crops4 = AugmentationExperiments(data_dir = '../../data/cropdata/Bavaria/sentinel-2/Training_bavaria.xlsx', batch_size = batch_size_sim, num_workers = num_workers, experiment='Experiment11')
 
-#normale augmentation wie blur, jitter
-#dm_crops1 = AugmentationExperiments(data_dir = '../../data/cropdata/Bavaria/sentinel-2/Training_bavaria.xlsx', batch_size = batch_size_sim, num_workers = num_workers, experiment='Experiment8')
-#dm_crops2 = AugmentationExperiments(data_dir = '../../data/cropdata/Bavaria/sentinel-2/Training_bavaria.xlsx', batch_size = batch_size_sim, num_workers = num_workers, experiment='Experiment9')
-#dm_crops3 = AugmentationExperiments(data_dir = '../../data/cropdata/Bavaria/sentinel-2/Training_bavaria.xlsx', batch_size = batch_size_sim, num_workers = num_workers, experiment='Experiment10')
-#dm_crops4 = AugmentationExperiments(data_dir = '../../data/cropdata/Bavaria/sentinel-2/Training_bavaria.xlsx', batch_size = batch_size_sim, num_workers = num_workers, experiment='Experiment11')
-
 #normale augmentation mit drift und noise
 dm_crops1 = AugmentationExperiments(data_dir = '../../data/cropdata/Bavaria/sentinel-2/Training_bavaria.xlsx', batch_size = batch_size_sim, num_workers = num_workers, experiment='Experiment12')
 dm_crops2 = AugmentationExperiments(data_dir = '../../data/cropdata/Bavaria/sentinel-2/Training_bavaria.xlsx', batch_size = batch_size_sim, num_workers = num_workers, experiment='Experiment13')
