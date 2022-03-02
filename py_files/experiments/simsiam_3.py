@@ -41,8 +41,8 @@ batch_size = 1349
 test_size = 0.25
 num_workers=4
 shuffle_dataset =True
-_epochs = 100
-_epochs_fine = 100
+_epochs = 300
+_epochs_fine = 300
 input_dim = 13
 #device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 lr =  0.0016612
@@ -88,10 +88,10 @@ dm_augmented = DataModule_augmentation(data_dir = '../../data/cropdata/Bavaria/s
 dm_years = AugmentationExperiments(data_dir = '../../data/cropdata/Bavaria/sentinel-2/Training_bavaria.xlsx', batch_size = batch_size_sim, num_workers = num_workers, experiment='Experiment4')
 
 # data for invariance between crops
-dm_crops1 = AugmentationExperiments(data_dir = '../../data/cropdata/Bavaria/sentinel-2/Training_bavaria.xlsx', batch_size = batch_size_sim, num_workers = num_workers, experiment='Experiment3')
-dm_crops2 = AugmentationExperiments(data_dir = '../../data/cropdata/Bavaria/sentinel-2/Training_bavaria.xlsx', batch_size = batch_size_sim, num_workers = num_workers, experiment='Experiment5')
-dm_crops3 = AugmentationExperiments(data_dir = '../../data/cropdata/Bavaria/sentinel-2/Training_bavaria.xlsx', batch_size = batch_size_sim, num_workers = num_workers, experiment='Experiment6')
-dm_crops4 = AugmentationExperiments(data_dir = '../../data/cropdata/Bavaria/sentinel-2/Training_bavaria.xlsx', batch_size = batch_size_sim, num_workers = num_workers, experiment='Experiment7')
+#dm_crops1 = AugmentationExperiments(data_dir = '../../data/cropdata/Bavaria/sentinel-2/Training_bavaria.xlsx', batch_size = batch_size_sim, num_workers = num_workers, experiment='Experiment3')
+#dm_crops2 = AugmentationExperiments(data_dir = '../../data/cropdata/Bavaria/sentinel-2/Training_bavaria.xlsx', batch_size = batch_size_sim, num_workers = num_workers, experiment='Experiment5')
+#dm_crops3 = AugmentationExperiments(data_dir = '../../data/cropdata/Bavaria/sentinel-2/Training_bavaria.xlsx', batch_size = batch_size_sim, num_workers = num_workers, experiment='Experiment6')
+#dm_crops4 = AugmentationExperiments(data_dir = '../../data/cropdata/Bavaria/sentinel-2/Training_bavaria.xlsx', batch_size = batch_size_sim, num_workers = num_workers, experiment='Experiment7')
 
 #daniel datamodule mit statistiken
 #dm_crops1 = AugmentationExperiments(data_dir = '../../data/cropdata/Bavaria/sentinel-2/Training_bavaria.xlsx', batch_size = batch_size_sim, num_workers = num_workers, experiment='Experiment8')
@@ -100,10 +100,10 @@ dm_crops4 = AugmentationExperiments(data_dir = '../../data/cropdata/Bavaria/sent
 #dm_crops4 = AugmentationExperiments(data_dir = '../../data/cropdata/Bavaria/sentinel-2/Training_bavaria.xlsx', batch_size = batch_size_sim, num_workers = num_workers, experiment='Experiment11')
 
 #normale augmentation mit drift und noise
-#dm_crops1 = AugmentationExperiments(data_dir = '../../data/cropdata/Bavaria/sentinel-2/Training_bavaria.xlsx', batch_size = batch_size_sim, num_workers = num_workers, experiment='Experiment12')
-#dm_crops2 = AugmentationExperiments(data_dir = '../../data/cropdata/Bavaria/sentinel-2/Training_bavaria.xlsx', batch_size = batch_size_sim, num_workers = num_workers, experiment='Experiment13')
-#dm_crops3 = AugmentationExperiments(data_dir = '../../data/cropdata/Bavaria/sentinel-2/Training_bavaria.xlsx', batch_size = batch_size_sim, num_workers = num_workers, experiment='Experiment14')
-#dm_crops4 = AugmentationExperiments(data_dir = '../../data/cropdata/Bavaria/sentinel-2/Training_bavaria.xlsx', batch_size = batch_size_sim, num_workers = num_workers, experiment='Experiment15')
+dm_crops1 = AugmentationExperiments(data_dir = '../../data/cropdata/Bavaria/sentinel-2/Training_bavaria.xlsx', batch_size = batch_size_sim, num_workers = num_workers, experiment='Experiment12')
+dm_crops2 = AugmentationExperiments(data_dir = '../../data/cropdata/Bavaria/sentinel-2/Training_bavaria.xlsx', batch_size = batch_size_sim, num_workers = num_workers, experiment='Experiment13')
+dm_crops3 = AugmentationExperiments(data_dir = '../../data/cropdata/Bavaria/sentinel-2/Training_bavaria.xlsx', batch_size = batch_size_sim, num_workers = num_workers, experiment='Experiment14')
+dm_crops4 = AugmentationExperiments(data_dir = '../../data/cropdata/Bavaria/sentinel-2/Training_bavaria.xlsx', batch_size = batch_size_sim, num_workers = num_workers, experiment='Experiment15')
 # %%
 # Vorgehen:
 # 1. Pre-Train transformer unsupervised mit allen Daten (typische Augmentation + physikalisch)
