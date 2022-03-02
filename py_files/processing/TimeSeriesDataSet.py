@@ -29,7 +29,7 @@ my_augmenter = (
 
 class AugmentationSampling():
     '''Obtain mean and std for each timestep from dataset and draw augmentation from that.
-       REQUIRES: data[type,channel,timestep,samples]
+       REQUIRES: data[year,type,channel,timestep,samples]
     '''
     def __init__(self, data) -> None:
         self.years = data.shape[0]
@@ -47,15 +47,17 @@ class AugmentationSampling():
 
     def create_augmentation(self, year, type, n_samples):
         if str(year)=='2016':
-            year = 1
+            year = 0
         if str(year)=='2017':
-            year = 2
+            year = 1
         if str(year)=='2018':
-            year = 3
+            year = 2
         samples = torch.zeros((n_samples, self.channels, self.time_steps))
         for n in range(n_samples):
             for c in range(self.channels):
                 for t in range(self.time_steps):
+                    # print(year,n,c,t)
+                    # print(self.mu.shape, self.std.shape)
                     samples[n,c,t] = torch.normal(mean=self.mu[year,type,c,t], std=self.std[year,type,c,t])
         return samples
 
@@ -107,6 +109,7 @@ class TSAugmented(Dataset):
         temp_data = np.array(data)
         n_features = len(data.NC.unique())
         n_years = len(data.Year.unique())
+        self.n_years = n_years
         n_channels = 13
         n_tsteps = 14
         n_samples = 100
@@ -159,9 +162,14 @@ class TSAugmented(Dataset):
         y = self.y[idx,0,0]
         field_id = self.field_ids[idx,0,0]
 
-        aug_samples = self.aug_sample.create_augmentation(y.item(),2)
+        # : Augmentation 1
+        year = int(np.rint(self.n_years * np.random.rand())) - 1       # 0: 2016, 1: 2017, 2: 2018
+        aug_samples = self.aug_sample.create_augmentation(year,y.item(),1)
         aug_x1 = aug_samples[0].permute(1,0)
-        aug_x2 = aug_samples[1].permute(1,0)
+        # : Augmentation 2
+        year = int(np.rint(self.n_years * np.random.rand())) - 1       # 0: 2016, 1: 2017, 2: 2018
+        aug_samples = self.aug_sample.create_augmentation(year,y.item(),1)
+        aug_x2 = aug_samples[0].permute(1,0)
 
         torchx = self.x2torch(x)
         torchy = self.y2torch(y)
